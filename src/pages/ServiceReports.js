@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ChartCard from '../components/Chart/ChartCard';
 import { Line, Bar } from 'react-chartjs-2';
 import {Button} from '@windmill/react-ui'
@@ -10,6 +10,19 @@ import {
 } from '../utils/demo/serviceChartsData';
 import { BarChartIcon, ChartsIcon, LineChartIcon } from '../icons'; // Icons for chart types
 
+///////////////////////////////////////////////////////////
+import {Input} from '@windmill/react-ui'
+import {SearchIcon } from '../icons'
+import mechanicData from '../utils/demo/mechanicData'
+import MechanicTable from '../components/Tables/MechanicTable'
+import { useHistory } from 'react-router-dom';
+/////////////////////////////////////////////////////////
+
+
+
+
+
+
 function Charts() {
   const [style, setStyle] = useState('Line'); // State for chart style
   const [dataType, setDataType] = useState('Months'); // State for data type (Months or Days)
@@ -20,46 +33,56 @@ function Charts() {
   const toggleChartStyle = () => {
     setStyle((prevStyle) => (prevStyle === 'Line' ? 'Bar' : 'Line'));
   };
+  
+  //////////////////////////////////////////////////////////////////
+  
+  const [allData, setAllData] = useState(mechanicData); // Store original data
+  const [filteredData, setFilteredData] = useState(mechanicData); // Filtered data based on search
+  const [pageTable2, setPageTable2] = useState(1);
+  const [showNotVerified, setShowNotVerified] = useState(false);
+  const resultsPerPage = 10;
+  const totalResults = filteredData.length;
+  const history = useHistory();
 
-  // Handle chart rendering based on style and data type
-  let chart;
-
-  if (dataType === 'Months') {
-    // Monthly data charts
-    switch (style) {
-      case 'Line':
-        chart = (
-          <ChartCard className="w-full" title="Services Per Month">
-            <Line {...serviceLineOptions} />
-          </ChartCard>
-        );
-        break;
-      case 'Bar':
-        chart = (
-          <ChartCard className="w-full" title="Services Per Month">
-            <Bar {...servicebarOptions} />
-          </ChartCard>
-        );
-        break;
-      default:
-        chart = <p>No chart available</p>;
-    }
-  } else if (dataType === 'Days') {
-    // Daily data chart for selected month and year
-    chart = (
-      <ChartCard className="w-full" title={`Services for ${selectedYear} - Month ${selectedMonth}`}>
-        <Line {...serviceDayLineOptions(selectedYear, selectedMonth)} />
-      </ChartCard>
-    );
+  function onPageChangeTable2(p) {
+    setPageTable2(p);
   }
+
+  const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    let filteredArray = allData.filter(mechanic => 
+      mechanic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mechanic.workshopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mechanic.cnic.includes(searchQuery)
+    );
+
+    if (showNotVerified) {
+      filteredArray = filteredArray.filter(mechanic => mechanic.verified === false);
+    }
+
+    setFilteredData(filteredArray);
+  }, [searchQuery, allData, showNotVerified]); 
+
+  const toggleNotVerified = () => {
+    setShowNotVerified(prev => !prev);
+  };
+
+  const goToProfile = (id) => {
+    history.push(`/app/mechanic/${id}`);
+  }
+
+  //////////////////////////////////////////////////////
 
   return (
     <>
-      <PageTitle>Services Reports</PageTitle>
+      <PageTitle>Services Statistics</PageTitle>
       <div className='flex justify-between mb-4'>
         <div>
           {/* Data type selector (Days or Months) */}
-          <label>Select Data Type:</label>
+          <label className='dark:text-gray-100'>Select Data Type: </label>
           <select
             id="dataType"
             value={dataType}
@@ -73,11 +96,11 @@ function Charts() {
           {dataType === 'Days' && (
             <>
               <div>
-                <label>Select Year:</label>
+                <label className='dark:text-gray-100'>Select Year: </label>
                 <select
                   id="year"
                   value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
                 >
                   {/* You can generate years dynamically or hardcode them */}
                   {[2024, 2023, 2022].map((year) => (
@@ -88,11 +111,11 @@ function Charts() {
                 </select>
               </div>
               <div>
-                <label>Select Month:</label>
+                <label className='dark:text-gray-100'>Select Month: </label>
                 <select
                   id="month"
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                     <option key={month} value={month}>
@@ -117,7 +140,47 @@ function Charts() {
       </div>
 
       {/* Render the selected chart */}
-      <div className="grid gap-6 mb-8 md:grid-cols-1">{chart}</div>
+      <div className="grid gap-6 mb-4 md:grid-cols-1">
+        {dataType === 'Months' ? (
+          style === 'Line' ? (
+            <ChartCard key="months-line-chart" className="w-full" title="Services Per Month">
+              <Line {...serviceLineOptions} />
+            </ChartCard>
+          ) : (
+            <ChartCard key="months-bar-chart" className="w-full" title="Services Per Month">
+              <Bar {...servicebarOptions} />
+            </ChartCard>
+          )
+        ) : (
+          <ChartCard key={`days-line-chart-${selectedYear}-${selectedMonth}`} className="w-full" title={`Services for ${selectedYear} - Month ${selectedMonth}`}>
+            <Line {...serviceDayLineOptions(selectedYear, selectedMonth)} />
+          </ChartCard>
+        )}
+      </div>
+
+      <PageTitle>Services</PageTitle>
+      <div className="flex mb-4 justify-between">
+        <div className="relative w-full max-w-xl mr-6 focus-within:text-gray-500">
+          <div className="absolute inset-y-0 flex items-center pl-2">
+            <SearchIcon className="w-4 h-4" aria-hidden="true" />
+          </div>
+          <Input
+            className="pl-8 text-gray-700"
+            placeholder="Search by CNIC, name or workshop..."
+            aria-label="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+      
+      <MechanicTable
+        dataTable2={paginatedData}
+        totalResults={totalResults}
+        resultsPerPage={resultsPerPage}
+        onPageChangeTable2={onPageChangeTable2}
+        goToProfile={goToProfile}
+      />
     </>
   );
 }

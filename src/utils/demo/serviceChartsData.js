@@ -15,17 +15,28 @@ const countServicesPerMonth = (services, year) => {
 
 // Count services per day for a specific month and year
 const countServicesPerDay = (services, year, month) => {
-  const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in month
-  const counts = Array(daysInMonth).fill(0); // For the number of days in the selected month
+  const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
+  const counts = Array(daysInMonth).fill(0); // Initialize counts for each day of the month
+
   services.forEach(service => {
     const [serviceMonth, day, serviceYear] = service.date.split('/');
-    if (serviceYear == year && parseInt(serviceMonth, 10) === month) {
+    
+    // Log the parsed values for debugging
+    console.log('Service Date:', service.date, 'Month:', serviceMonth, 'Day:', day, 'Year:', serviceYear);
+
+    // Ensure the service date matches the selected year and month
+    if (parseInt(serviceYear, 10) == year && parseInt(serviceMonth, 10) === month) {
       const dayIndex = parseInt(day, 10) - 1; // Convert day to zero-based index
-      counts[dayIndex]++;
+      counts[dayIndex]++; // Increment the count for the specific day
     }
   });
+
+  // Log the final counts array for debugging
+  console.log('Service Counts for Days:', counts);
+
   return counts;
 };
+
 
 // Get unique years from the dataset
 const getUniqueYears = (services) => {
