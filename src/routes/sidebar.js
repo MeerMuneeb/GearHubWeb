@@ -51,7 +51,7 @@ const routes = [
     routes: [
       // submenu
       {
-        path: '',
+        path: '/app/service-reports',
         name: 'Services Reports',
       },
       {

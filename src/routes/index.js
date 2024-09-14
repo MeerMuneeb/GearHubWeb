@@ -16,6 +16,7 @@ const Users = lazy(() => import('../pages/Users'))
 const SpareParts = lazy(() => import('../pages/SpareParts'))
 const ApproveParts = lazy(() => import('../pages/ApproveParts'))
 const VerifyMechanic = lazy(() => import('../pages/VerifyMechanic'))
+const ServiceReports = lazy(() => import('../pages/ServiceReports'))
 
 /**
  * ⚠ These are internal routes!
@@ -31,6 +32,10 @@ const routes = [
   {
     path: '/dashboard', // the url
     component: Dashboard, // view rendered
+  },
+  {
+    path: '/service-reports', // the url
+    component: ServiceReports, // view rendered
   },
   {
     path: '/admins', // the url
