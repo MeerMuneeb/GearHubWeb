@@ -34,9 +34,13 @@ import { ReactComponent as ApprovalIcon } from './approvals.svg'
 import { ReactComponent as ToolsIcon } from './tools.svg'
 import { ReactComponent as ApproveIcon } from './approve.svg'
 import { ReactComponent as CrossIcon } from './cross.svg'
+import { ReactComponent as LineChartIcon } from './line.svg'
+import { ReactComponent as BarChartIcon } from './bar.svg'
 
 
 export {
+  LineChartIcon,
+  BarChartIcon,
   CrossIcon,
   ApproveIcon,
   ToolsIcon,
