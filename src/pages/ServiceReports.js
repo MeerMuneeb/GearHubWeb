@@ -1,9 +1,10 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 
 import ChartCard from '../components/Chart/ChartCard'
 import { Doughnut, Line, Bar } from 'react-chartjs-2'
 import ChartLegend from '../components/Chart/ChartLegend'
 import PageTitle from '../components/Typography/PageTitle'
+import mechanics from '../utils/demo/userData'
 import {
   doughnutOptions,
   lineOptions,
@@ -14,6 +15,14 @@ import {
 } from '../utils/demo/chartsData'
 
 function Charts() {
+  const [mechnicIds, setMechanicIds] = useState([])
+
+  useEffect(() => {
+    const ids = mechanics.map(mechanic => mechanic.id);
+    console.log(ids); // Print the array of IDs in the console
+  }, []);
+
+
   return (
     <>
       <PageTitle>Services Reports</PageTitle>
