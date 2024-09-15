@@ -1,29 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import ChartCard from '../components/Chart/ChartCard';
 import { Line, Bar } from 'react-chartjs-2';
-import {Button} from '@windmill/react-ui'
+import {Button, Input} from '@windmill/react-ui'
 import PageTitle from '../components/Typography/PageTitle';
 import {
   serviceLineOptions,
   servicebarOptions,
   serviceDayLineOptions,
 } from '../utils/demo/serviceChartsData';
-import { BarChartIcon, ChartsIcon, LineChartIcon } from '../icons'; // Icons for chart types
-
-///////////////////////////////////////////////////////////
-import {Input} from '@windmill/react-ui'
-import {SearchIcon } from '../icons'
+import { BarChartIcon, SearchIcon, LineChartIcon } from '../icons';
+import serviceData from '../utils/demo/serviceData'
 import mechanicData from '../utils/demo/mechanicData'
-import MechanicTable from '../components/Tables/MechanicTable'
+import userData from '../utils/demo/userData'
+import ServiceTable from '../components/Tables/ServiceTable'
 import { useHistory } from 'react-router-dom';
-/////////////////////////////////////////////////////////
 
-
-
-
-
-
-function Charts() {
+function ServiceAnalytics() {
   const [style, setStyle] = useState('Line'); // State for chart style
   const [dataType, setDataType] = useState('Months'); // State for data type (Months or Days)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Default to current year
@@ -36,44 +28,47 @@ function Charts() {
   
   //////////////////////////////////////////////////////////////////
   
-  const [allData, setAllData] = useState(mechanicData); // Store original data
-  const [filteredData, setFilteredData] = useState(mechanicData); // Filtered data based on search
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [pageTable2, setPageTable2] = useState(1);
-  const [showNotVerified, setShowNotVerified] = useState(false);
   const resultsPerPage = 10;
   const totalResults = filteredData.length;
+  const [searchQuery, setSearchQuery] = useState('');
   const history = useHistory();
 
+  useEffect(() => {
+      const mergedData = serviceData.map(service => {
+          const mechanic = mechanicData.find(m => m.id === service.mechanicID);
+          const user = userData.find(u => u.id === service.userID);
+          return {
+              ...service,
+              mechanicName: mechanic ? mechanic.name : 'Unknown Mechanic',
+              userName: user ? `${user.firstName} ${user.lastName}` : 'Unknown User',
+          };
+      });
+      setAllData(mergedData);
+      setFilteredData(mergedData);
+  }, []);
+
+  useEffect(() => {
+      const lowercasedQuery = searchQuery.toLowerCase();
+      const filteredArray = allData.filter(service => 
+          service.mechanicName.toLowerCase().includes(lowercasedQuery) ||
+          service.userName.toLowerCase().includes(lowercasedQuery) ||
+          service.id.toString().includes(lowercasedQuery)
+      );
+      setFilteredData(filteredArray);
+  }, [searchQuery, allData]);
+
   function onPageChangeTable2(p) {
-    setPageTable2(p);
+      setPageTable2(p);
   }
 
   const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
 
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    let filteredArray = allData.filter(mechanic => 
-      mechanic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mechanic.workshopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mechanic.cnic.includes(searchQuery)
-    );
-
-    if (showNotVerified) {
-      filteredArray = filteredArray.filter(mechanic => mechanic.verified === false);
-    }
-
-    setFilteredData(filteredArray);
-  }, [searchQuery, allData, showNotVerified]); 
-
-  const toggleNotVerified = () => {
-    setShowNotVerified(prev => !prev);
+  const serviceDetails = (id) => {
+      history.push(`/app/service/${id}`);
   };
-
-  const goToProfile = (id) => {
-    history.push(`/app/mechanic/${id}`);
-  }
-
   //////////////////////////////////////////////////////
 
   return (
@@ -160,29 +155,29 @@ function Charts() {
 
       <PageTitle>Services</PageTitle>
       <div className="flex mb-4 justify-between">
-        <div className="relative w-full max-w-xl mr-6 focus-within:text-gray-500">
-          <div className="absolute inset-y-0 flex items-center pl-2">
-            <SearchIcon className="w-4 h-4" aria-hidden="true" />
+          <div className="relative w-full max-w-xl mr-6 focus-within:text-gray-500">
+              <div className="absolute inset-y-0 flex items-center pl-2">
+                  <SearchIcon className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <Input
+                  className="pl-8 text-gray-700"
+                  placeholder="Search by mechanic, user, or service ID..."
+                  aria-label="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+              />
           </div>
-          <Input
-            className="pl-8 text-gray-700"
-            placeholder="Search by CNIC, name or workshop..."
-            aria-label="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
       </div>
-      
-      <MechanicTable
-        dataTable2={paginatedData}
-        totalResults={totalResults}
-        resultsPerPage={resultsPerPage}
-        onPageChangeTable2={onPageChangeTable2}
-        goToProfile={goToProfile}
+
+      <ServiceTable
+          dataTable2={paginatedData}
+          totalResults={totalResults}
+          resultsPerPage={resultsPerPage}
+          onPageChangeTable2={onPageChangeTable2}
+          serviceDetails={serviceDetails}
       />
     </>
   );
 }
 
-export default Charts;
+export default ServiceAnalytics;

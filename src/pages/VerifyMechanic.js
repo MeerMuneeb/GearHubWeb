@@ -24,6 +24,7 @@ function VerifyMechanic() {
 
   // Find the mechanic based on the ID
   const mechanic = mechanicData.find((m) => m.id === mechanicID);
+  
 
   if (!mechanic) {
     return <p>Mechanic not found</p>;

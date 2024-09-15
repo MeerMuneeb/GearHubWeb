@@ -17,6 +17,7 @@ const SpareParts = lazy(() => import('../pages/SpareParts'))
 const ApproveParts = lazy(() => import('../pages/ApproveParts'))
 const VerifyMechanic = lazy(() => import('../pages/VerifyMechanic'))
 const ServiceReports = lazy(() => import('../pages/ServiceReports'))
+const ServiceDetails = lazy(() => import('../pages/ServiceDetails'))
 
 /**
  * ⚠ These are internal routes!
@@ -92,6 +93,10 @@ const routes = [
   {
     path: '/mechanic/:mechanicID',
     component: VerifyMechanic,
+  },
+  {
+    path: '/service/:serviceID',
+    component: ServiceDetails,
   }
 ]
 
