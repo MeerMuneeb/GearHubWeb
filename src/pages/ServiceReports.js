@@ -20,13 +20,6 @@ function ServiceAnalytics() {
   const [dataType, setDataType] = useState('Months'); // State for data type (Months or Days)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Default to current year
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Default to current month
-
-  // Toggle chart style (Line/Bar) and update button icon
-  const toggleChartStyle = () => {
-    setStyle((prevStyle) => (prevStyle === 'Line' ? 'Bar' : 'Line'));
-  };
-  
-  //////////////////////////////////////////////////////////////////
   
   const [allData, setAllData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -35,6 +28,13 @@ function ServiceAnalytics() {
   const totalResults = filteredData.length;
   const [searchQuery, setSearchQuery] = useState('');
   const history = useHistory();
+
+  // Toggle chart style (Line/Bar) and update button icon
+  const toggleChartStyle = () => {
+    setStyle((prevStyle) => (prevStyle === 'Line' ? 'Bar' : 'Line'));
+  };
+  
+  //////////////////////////////////////////////////////////////////
 
   useEffect(() => {
       const mergedData = serviceData.map(service => {

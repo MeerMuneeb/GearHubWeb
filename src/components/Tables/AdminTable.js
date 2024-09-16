@@ -85,7 +85,7 @@ const TableComponent = ({
                 <div className="flex items-center text-sm">
                   <div>
                     <p className="font-semibold">{admin.name}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">{admin.role}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold">{admin.role}</p>
                   </div>
                 </div>
               </TableCell>

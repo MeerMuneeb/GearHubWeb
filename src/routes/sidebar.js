@@ -65,6 +65,11 @@ const routes = [
     ]
   },
   {
+    path: '/app/support',
+    icon: 'SupportIcon',
+    name: 'Support Inbox',
+  },
+  {
     path: '/app/forms',
     icon: 'FormsIcon',
     name: 'Forms',

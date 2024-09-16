@@ -36,9 +36,13 @@ import { ReactComponent as ApproveIcon } from './approve.svg'
 import { ReactComponent as CrossIcon } from './cross.svg'
 import { ReactComponent as LineChartIcon } from './line.svg'
 import { ReactComponent as BarChartIcon } from './bar.svg'
+import { ReactComponent as StarIcon } from './star.svg'
+import { ReactComponent as SupportIcon } from './support.svg'
 
 
 export {
+  SupportIcon,
+  StarIcon,
   LineChartIcon,
   BarChartIcon,
   CrossIcon,
