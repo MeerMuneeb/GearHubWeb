@@ -5,6 +5,7 @@ import { SearchIcon } from '../icons'
 import userData from '../utils/demo/userData'
 import UserTable from '../components/Tables/UserTable'
 import serviceData from '../utils/demo/serviceData'
+import { useHistory } from 'react-router-dom';
 
 function Tables() {
   const [allData, setAllData] = useState([]); // Original data with servicesTaken count
@@ -12,6 +13,7 @@ function Tables() {
   const [pageTable2, setPageTable2] = useState(1);
   const resultsPerPage = 10;
   const totalResults = filteredData.length;
+  const history = useHistory();
   
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -33,9 +35,11 @@ function Tables() {
     setFilteredData(filteredArray);
   }, [searchQuery, allData]); 
 
-  const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
-
-  const goToProfile = () => {}
+  const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage); 
+  
+  const goToProfile = (id) => {
+    history.push(`/app/user/${id}`);
+  }
 
   function onPageChangeTable2(p) {
     setPageTable2(p);

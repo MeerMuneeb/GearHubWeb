@@ -48,9 +48,6 @@ function VerifyMechanic() {
       </Modal>
 
       <div className="container mx-auto">
-        {/* Mechanic Header */}
-        <Card>
-          <CardBody>
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <img
@@ -69,8 +66,6 @@ function VerifyMechanic() {
                 </Badge>
               </div>
             </div>
-          </CardBody>
-        </Card>
 
         {/* Basic Info Section */}
         <Card className="mt-4">

@@ -18,6 +18,7 @@ const ApproveParts = lazy(() => import('../pages/ApproveParts'))
 const VerifyMechanic = lazy(() => import('../pages/VerifyMechanic'))
 const ServiceReports = lazy(() => import('../pages/ServiceReports'))
 const ServiceDetails = lazy(() => import('../pages/ServiceDetails'))
+const UserDetails = lazy(() => import('../pages/UserDetails'))
 const Support = lazy(() => import('../pages/Support'))
 
 /**
@@ -102,6 +103,10 @@ const routes = [
   {
     path: '/service/:serviceID',
     component: ServiceDetails,
+  },
+  {
+    path: '/user/:userID',
+    component: UserDetails,
   }
 ]
 
