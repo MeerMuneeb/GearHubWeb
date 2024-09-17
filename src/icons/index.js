@@ -38,9 +38,14 @@ import { ReactComponent as LineChartIcon } from './line.svg'
 import { ReactComponent as BarChartIcon } from './bar.svg'
 import { ReactComponent as StarIcon } from './star.svg'
 import { ReactComponent as SupportIcon } from './support.svg'
+import { ReactComponent as DotIcon } from './dot.svg'
+import { ReactComponent as LogoutIcon } from './logout.svg'
+
 
 
 export {
+  LogoutIcon,
+  DotIcon,
   SupportIcon,
   StarIcon,
   LineChartIcon,

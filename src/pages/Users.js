@@ -1,35 +1,45 @@
 import React, { useState, useEffect } from 'react'
 import PageTitle from '../components/Typography/PageTitle'
-import {Input} from '@windmill/react-ui'
-import {SearchIcon } from '../icons'
+import { Input } from '@windmill/react-ui'
+import { SearchIcon } from '../icons'
 import userData from '../utils/demo/userData'
 import UserTable from '../components/Tables/UserTable'
-
+import serviceData from '../utils/demo/serviceData'
 
 function Tables() {
-    const [allData, setAllData] = useState(userData); // Store original data
-    const [filteredData, setFilteredData] = useState(userData); // Filtered data based on search
-    const [pageTable2, setPageTable2] = useState(1);
-    const resultsPerPage = 10;
-    const totalResults = filteredData.length;
+  const [allData, setAllData] = useState([]); // Original data with servicesTaken count
+  const [filteredData, setFilteredData] = useState([]); // Filtered data based on search
+  const [pageTable2, setPageTable2] = useState(1);
+  const resultsPerPage = 10;
+  const totalResults = filteredData.length;
   
-    function onPageChangeTable2(p) {
-      setPageTable2(p);
-    }
+  const [searchQuery, setSearchQuery] = useState('');
 
-    const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
-  
-    const [searchQuery, setSearchQuery] = useState('');
+  // Merge user data with servicesTaken count from serviceData
+  useEffect(() => {
+    const mergedData = userData.map(user => {
+      const servicesTakenCount = serviceData.filter(service => service.userID === user.id).length;
+      return { ...user, servicesTaken: servicesTakenCount };
+    });
+    setAllData(mergedData);
+    setFilteredData(mergedData);
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
 
-    useEffect(() => {
-      let filteredArray = allData.filter(user => 
-        (`${user.firstName} ${user.lastName}`).toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  // Filter data based on search query
+  useEffect(() => {
+    let filteredArray = allData.filter(user => 
+      (`${user.firstName} ${user.lastName}`).toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filteredArray);
+  }, [searchQuery, allData]); 
 
-      setFilteredData(filteredArray);
-    }, [searchQuery, allData]); 
-  
-    const goToProfile = () => {}
+  const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
+
+  const goToProfile = () => {}
+
+  function onPageChangeTable2(p) {
+    setPageTable2(p);
+  }
 
   return (
     <>

@@ -10,6 +10,8 @@ import RoundIcon from '../components/RoundIcon'
 import response from '../utils/demo/tableData'
 import users from '../utils/demo/userData'
 import mechanics from '../utils/demo/mechanicData'
+import tickets from '../utils/demo/tickets'
+import services from '../utils/demo/serviceData'
 import {
   TableBody,
   TableContainer,
@@ -29,6 +31,7 @@ import {
   doughnutLegends,
   lineLegends,
 } from '../utils/demo/chartsData'
+import { serviceLineOptions } from '../utils/demo/serviceChartsData'
 
 function Dashboard() {
   const [page, setPage] = useState(1)
@@ -76,7 +79,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Total Services" value="35">
+        <InfoCard title="Total Services" value={services.length}>
           <RoundIcon
             icon={ToolsIcon}
             iconColorClass="text-teal-500 dark:text-teal-100"
@@ -94,15 +97,25 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Support Requests" value="376">
+        <InfoCard title="Support Requests" value={tickets.length}>
           <RoundIcon
             icon={ChatIcon}
             iconColorClass="text-blue-500 dark:text-blue-100"
             bgColorClass="bg-blue-100 dark:bg-blue-500"
             className="mr-4"
           />
-        </InfoCard>
-        
+        </InfoCard>        
+      </div>
+
+      <div className="grid gap-6 mb-8 md:grid-cols-2">
+        <ChartCard title="Revenue">
+          <Doughnut {...doughnutOptions} />
+          <ChartLegend legends={doughnutLegends} />
+        </ChartCard>
+
+        <ChartCard title="Services">
+          <Line {...serviceLineOptions} />
+        </ChartCard>
       </div>
 
       <TableContainer>
@@ -148,20 +161,7 @@ function Dashboard() {
             onChange={onPageChange}
           />
         </TableFooter>
-      </TableContainer>
-
-      <PageTitle>Charts</PageTitle>
-      <div className="grid gap-6 mb-8 md:grid-cols-2">
-        <ChartCard title="Revenue">
-          <Doughnut {...doughnutOptions} />
-          <ChartLegend legends={doughnutLegends} />
-        </ChartCard>
-
-        <ChartCard title="Traffic">
-          <Line {...lineOptions} />
-          <ChartLegend legends={lineLegends} />
-        </ChartCard>
-      </div>
+      </TableContainer>      
     </>
   )
 }

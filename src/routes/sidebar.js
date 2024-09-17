@@ -69,35 +69,35 @@ const routes = [
     icon: 'SupportIcon',
     name: 'Support Inbox',
   },
-  {
-    path: '/app/forms',
-    icon: 'FormsIcon',
-    name: 'Forms',
-  },
-  {
-    path: '/app/cards',
-    icon: 'CardsIcon',
-    name: 'Cards',
-  },
-  {
-    path: '/app/charts',
-    icon: 'ChartsIcon',
-    name: 'Charts',
-  },
-  {
-    path: '/app/buttons',
-    icon: 'ButtonsIcon',
-    name: 'Buttons',
-  },
-  {
-    path: '/app/modals',
-    icon: 'ModalsIcon',
-    name: 'Modals',
-  },
+  // {
+  //   path: '/app/forms',
+  //   icon: 'FormsIcon',
+  //   name: 'Forms',
+  // },
+  // {
+  //   path: '/app/cards',
+  //   icon: 'CardsIcon',
+  //   name: 'Cards',
+  // },
+  // {
+  //   path: '/app/charts',
+  //   icon: 'ChartsIcon',
+  //   name: 'Charts',
+  // },
+  // {
+  //   path: '/app/buttons',
+  //   icon: 'ButtonsIcon',
+  //   name: 'Buttons',
+  // },
+  // {
+  //   path: '/app/modals',
+  //   icon: 'ModalsIcon',
+  //   name: 'Modals',
+  // },
   {
     path: '/app/tables',
-    icon: 'TablesIcon',
-    name: 'Tables',
+    icon: 'ChatIcon',
+    name: 'Live Chat',
   },
 ]
 
