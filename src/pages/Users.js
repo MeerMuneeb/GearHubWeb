@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import PageTitle from '../components/Typography/PageTitle'
-import { Input } from '@windmill/react-ui'
-import { SearchIcon } from '../icons'
-import userData from '../utils/demo/userData'
-import UserTable from '../components/Tables/UserTable'
-import serviceData from '../utils/demo/serviceData'
+import React, { useState, useEffect } from 'react';
+import PageTitle from '../components/Typography/PageTitle';
+import { Input } from '@windmill/react-ui';
+import { SearchIcon } from '../icons';
+import UserTable from '../components/Tables/UserTable';
 import { useHistory } from 'react-router-dom';
+import { getUsers } from '../apis/usersApi';
 
 function Tables() {
   const [allData, setAllData] = useState([]); // Original data with servicesTaken count
@@ -17,14 +16,23 @@ function Tables() {
   
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Merge user data with servicesTaken count from serviceData
+  // Fetch user data from the API
   useEffect(() => {
-    const mergedData = userData.map(user => {
-      const servicesTakenCount = serviceData.filter(service => service.userID === user.id).length;
-      return { ...user, servicesTaken: servicesTakenCount };
-    });
-    setAllData(mergedData);
-    setFilteredData(mergedData);
+    const fetchData = async () => {
+      try {
+        const users = await getUsers(); // Fetch users from API
+        // Simulate servicesTaken count for each user (you may replace this logic based on your actual service data)
+        const mergedData = users.map(user => {
+          const servicesTakenCount = Math.floor(Math.random() * 10); // Need to replace with the service api
+          return { ...user, servicesTaken: servicesTakenCount };
+        });
+        setAllData(mergedData);
+        setFilteredData(mergedData);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchData();
   }, []); // Empty dependency array ensures this runs only once when the component mounts
 
   // Filter data based on search query
@@ -39,7 +47,7 @@ function Tables() {
   
   const goToProfile = (id) => {
     history.push(`/app/user/${id}`);
-  }
+  };
 
   function onPageChangeTable2(p) {
     setPageTable2(p);
@@ -71,7 +79,7 @@ function Tables() {
         goToProfile={goToProfile}
       />
     </>
-  )
+  );
 }
 
-export default Tables
+export default Tables;

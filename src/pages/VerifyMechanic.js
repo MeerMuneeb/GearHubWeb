@@ -1,33 +1,68 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import mechanicData from '../utils/demo/mechanicData';
+import React, { useState, useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { getMechanicById, updateMechanic } from '../apis/mechanicApi'; // Import updateMechanic
 import PageTitle from '../components/Typography/PageTitle';
-import {  Modal, ModalHeader, ModalBody, Card, CardBody, Badge, Button } from '@windmill/react-ui';
+import { Modal, ModalHeader, ModalBody, Card, CardBody, Badge, Button } from '@windmill/react-ui';
 import dummyMap from '../assets/img/dummy-map.png'
 
 function VerifyMechanic() {
-  const { mechanicID } = useParams();  // Retrieve mechanic ID from route params
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [imagePath, setImagePath] = useState(null)
+  const { mechanicID } = useParams();
+  const [mechanic, setMechanic] = useState(null);  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imagePath, setImagePath] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false); // For button loading state
+  const history = useHistory(); 
+
+  const handleCancel = () => {
+    history.push(`/app/mechanics`);
+  };
 
   const openModal = (path) => {
     if (path !== null) {
-      setImagePath(path)
+      setImagePath(path);
     }
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   function closeModal() {
-    setImagePath(null)
-    setIsModalOpen(false)
+    setImagePath(null);
+    setIsModalOpen(false);
   }
 
-  // Find the mechanic based on the ID
-  const mechanic = mechanicData.find((m) => m.id === mechanicID);
-  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedMechanic = await getMechanicById(mechanicID);
+        setMechanic(fetchedMechanic);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching mechanic:', error);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [mechanicID]);
 
-  if (!mechanic) {
-    return <p>Mechanic not found</p>;
+  // Function to toggle the mechanic's verified status
+  const toggleVerifiedStatus = async () => {
+    setUpdating(true);
+    try {
+      // Update the mechanic's verified status
+      const updatedMechanic = await updateMechanic(mechanicID, {
+        ...mechanic,
+        verified: !mechanic.verified, // Toggle the verified status
+      });
+      setMechanic(updatedMechanic); // Update the state with the new mechanic data
+    } catch (error) {
+      console.error('Error updating mechanic status:', error);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading Mechanic...</p>;
   }
 
   return (
@@ -42,30 +77,30 @@ function VerifyMechanic() {
               <img className="w-full mt-2" style={{ maxHeight: '400px', objectFit: 'contain' }} src={imagePath} alt="CNIC Verification" />
             </div>
           ) : (
-            <p><strong>No Image Found!</strong></p>
+            <p><strong>No Image Foundd!</strong></p>
           )}
         </ModalBody>
       </Modal>
 
       <div className="container mx-auto">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <img
-                  className="w-32 h-32 rounded-full object-cover mr-6"
-                  src={mechanic.img || '/img/default-avatar.jpg'}
-                  alt={`${mechanic.name}'s profile`}
-                />
-                <div>
-                  <h2 className="text-xl font-semibold dark:text-gray-100">{mechanic.name}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{mechanic.workshopName}</p>
-                </div>
-              </div>
-              <div>
-                <Badge className="text-lg p-3 pr-5 pl-5" type={mechanic.verified ? 'success' : 'danger'}>
-                  {mechanic.verified ? 'Verified' : 'Not Verified'}
-                </Badge>
-              </div>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <img
+              className="w-32 h-32 rounded-full object-cover mr-6"
+              src={mechanic.img || '/img/default-avatar.jpg'}
+              alt={`${mechanic.name}'s profile`}
+            />
+            <div>
+              <h2 className="text-xl font-semibold dark:text-gray-100">{mechanic.name}</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{mechanic.workshopName}</p>
             </div>
+          </div>
+          <div>
+            <Badge className="text-lg p-3 pr-5 pl-5" type={mechanic.verified ? 'success' : 'danger'}>
+              {mechanic.verified ? 'Verified' : 'Not Verified'}
+            </Badge>
+          </div>
+        </div>
 
         {/* Basic Info Section */}
         <Card className="mt-4">
@@ -144,10 +179,25 @@ function VerifyMechanic() {
           </CardBody>
         </Card>
 
-        {/* Approve / Reject Buttons */}
+        {/* Approve / Deactivate Button */}
         <div className="mt-4 mb-5 flex justify-end">
-          <Button layout="outline" className="mr-4">Approve Mechanic</Button>
-          <Button layout="link" className="text-red-600 dark:text-red-400">Reject Mechanic</Button>
+          <Button
+            layout="outline"
+            className="mr-4"
+            onClick={toggleVerifiedStatus}
+            disabled={updating}
+          >
+            {updating
+              ? mechanic.verified
+                ? 'Deactivating...'
+                : 'Approving...'
+              : mechanic.verified
+              ? 'Deactivate Mechanic'
+              : 'Approve Mechanic'}
+          </Button>
+          <Button layout="link" className="text-red-600 dark:text-red-400" onClick={handleCancel}>
+            Cancel
+          </Button>
         </div>
       </div>
     </>

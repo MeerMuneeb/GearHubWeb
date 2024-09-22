@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 
-import InfoCard from '../components/Cards/InfoCard'
-import ChartCard from '../components/Chart/ChartCard'
-import { Doughnut, Line } from 'react-chartjs-2'
-import ChartLegend from '../components/Chart/ChartLegend'
-import PageTitle from '../components/Typography/PageTitle'
-import { ChatIcon, PeopleIcon, ApprovalIcon, ToolsIcon } from '../icons'
-import RoundIcon from '../components/RoundIcon'
-import response from '../utils/demo/tableData'
-import users from '../utils/demo/userData'
-import mechanics from '../utils/demo/mechanicData'
-import tickets from '../utils/demo/tickets'
-import services from '../utils/demo/serviceData'
+import InfoCard from '../components/Cards/InfoCard';
+import ChartCard from '../components/Chart/ChartCard';
+import { Doughnut, Line } from 'react-chartjs-2';
+import ChartLegend from '../components/Chart/ChartLegend';
+import PageTitle from '../components/Typography/PageTitle';
+import { ChatIcon, PeopleIcon, ApprovalIcon, ToolsIcon } from '../icons';
+import RoundIcon from '../components/RoundIcon';
+import response from '../utils/demo/tableData';
+import { getServices } from '../apis/servicesApi.js';
+import { getUsers } from '../apis/usersApi';
+import { getMechanics } from '../apis/mechanicApi';
+import { getTickets } from '../apis/ticketsApi';
 import {
   TableBody,
   TableContainer,
@@ -23,37 +23,79 @@ import {
   Avatar,
   Badge,
   Pagination,
-} from '@windmill/react-ui'
+} from '@windmill/react-ui';
 
 import {
   doughnutOptions,
   lineOptions,
   doughnutLegends,
   lineLegends,
-} from '../utils/demo/chartsData'
-import { serviceLineOptions } from '../utils/demo/serviceChartsData'
+} from '../utils/demo/chartsData';
+import { serviceLineOptions } from '../utils/demo/serviceChartsData';
 
 function Dashboard() {
-  const [page, setPage] = useState(1)
-  const [data, setData] = useState([])
-  
-  const nonVerifiedMechanics = mechanics.filter(mechanic => mechanic.verified === false);
-  const nonVerifiedCount = nonVerifiedMechanics.length;
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [mechanics, setMechanics] = useState([]);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // pagination setup
-  const resultsPerPage = 10
-  const totalResults = response.length
+  // Fetch data using useEffect
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [ticketsData, usersData, mechanicsData, servicesData] = await Promise.all([
+          getTickets(),
+          getUsers(),
+          getMechanics(),
+          getServices(),
+        ]);
+
+        if (ticketsData && usersData && mechanicsData && servicesData) {
+          setTickets(ticketsData);
+          setUsers(usersData);
+          setMechanics(mechanicsData);
+          setServices(servicesData);
+        } else {
+          throw new Error('Incomplete data received');
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Handle pagination
+  useEffect(() => {
+    setData(response.slice((page - 1) * 10, page * 10)); // Assume response is a static data array for table
+  }, [page]);
+
+  // Handle loading and error states
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  //////////////////////////////
+
+  const nonVerifiedMechanics = mechanics.filter((mechanic) => mechanic.verified === false);
+  const nonVerifiedCount = nonVerifiedMechanics.length;
+  const newTickets = tickets.filter((ticket) => ticket.isRead === false);
+
+  const resultsPerPage = 10;
+  const totalResults = response.length;
 
   // pagination change control
   function onPageChange(p) {
-    setPage(p)
+    setPage(p);
   }
 
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-  useEffect(() => {
-    setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage))
-  }, [page])
 
   return (
     <>
@@ -97,7 +139,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Support Requests" value={tickets.length}>
+        <InfoCard title="Support Requests" value={newTickets.length}>
           <RoundIcon
             icon={ChatIcon}
             iconColorClass="text-blue-500 dark:text-blue-100"
@@ -113,8 +155,8 @@ function Dashboard() {
           <ChartLegend legends={doughnutLegends} />
         </ChartCard>
 
-        <ChartCard title="Services">
-          <Line {...serviceLineOptions} />
+        <ChartCard title="Services Analytics">
+          <Line {...serviceLineOptions(services)} />
         </ChartCard>
       </div>
 

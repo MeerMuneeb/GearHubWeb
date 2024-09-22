@@ -3,7 +3,12 @@ import PageTitle from '../components/Typography/PageTitle';
 import { Textarea, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from '@windmill/react-ui';
 import { SearchIcon } from '../icons';
 import PartsTable from '../components/Tables/PartsTable';
-import partsData from '../utils/demo/sparepartsData';
+import {
+  getParts,
+  createPart,
+  updatePart,
+  deletePart
+} from '../apis/partsApi';
 
 function Tables() {
   const [name, setName] = useState('');
@@ -14,13 +19,27 @@ function Tables() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const [allData, setAllData] = useState(partsData);
-  const [filteredData, setFilteredData] = useState(partsData);
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const [pageTable2, setPageTable2] = useState(1);
   const fileInputRef = useRef(null);
   const resultsPerPage = 10;
   const totalResults = filteredData.length;
+
+  const fetchParts = async () => {
+    try {
+      const parts = await getParts();
+      setAllData(parts);
+      setFilteredData(parts);
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchParts();
+  }, []);
 
   // Pagination control
   function onPageChangeTable2(p) {
@@ -74,42 +93,62 @@ function Tables() {
     setEditModalOpen(false);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newItem = {
       id: Math.random().toString(36).substring(2, 9),
       name,
       description,
       price: parseFloat(price),
       img,
-      mechanicID: null, // Always set mechanicID to null
+      mechanicID: null, 
+      isApproved: true
     };
 
-    const updatedData = [...allData, newItem];
-    setAllData(updatedData);
-    setFilteredData(updatedData); // Update both data states
+    try {
+      await createPart(newItem);
+      window.alert('item added successfully!')
+      fetchParts();
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+      window.alert('Error Adding the Item!')
+    }
+
+    // Update both data states
     closeAddModal();
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     const updatedItem = {
       id: editId, // Use the existing id
       name,
       description,
       price: parseFloat(price),
       img,
-      mechanicID: null, // Always set mechanicID to null
+      mechanicID: null, 
+      isApproved: true
     };
 
-    const updatedData = allData.map(item => item.id === editId ? updatedItem : item);
-    setAllData(updatedData);
-    setFilteredData(updatedData);
+    try {
+      await updatePart(editId, updatedItem);
+      window.alert('item updated successfully!')
+      fetchParts();
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+      window.alert('Error updating the Item!')
+    }
+
     closeEditModal();
   };
 
-  const handleDelete = (id) => {
-    const updatedData = allData.filter(item => item.id !== id);
-    setAllData(updatedData);
-    setFilteredData(updatedData); // Update both states
+  const handleDelete = async (id) => {
+    try {
+      await deletePart(id)
+      window.alert('item deleted successfully!')
+      fetchParts();
+    } catch (e) {
+      console.error(e);      
+      window.alert('Error deleting the Item!')
+    }
   };
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,7 +158,7 @@ function Tables() {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredData(filteredArray.filter(item => item.mechanicID === null));
+    setFilteredData(filteredArray.filter(item => item.isApproved === true));
   }, [searchQuery, allData]);
 
   return (

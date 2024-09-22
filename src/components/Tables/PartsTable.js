@@ -11,7 +11,6 @@ import {
   Pagination
 } from '@windmill/react-ui';
 import { ApproveIcon, CrossIcon, EditIcon, TrashIcon } from '../../icons';
-import mechanicData from '../../utils/demo/mechanicData';
 
 const TableComponent = ({
   dataTable2,
@@ -124,7 +123,7 @@ const TableComponent = ({
                 <span className="text-sm">
                 {
                   // Find the mechanic name based on the mechanicID
-                  mechanicData.find(mechanic => mechanic.id === item.mechanicID)?.name || 'N/A'
+                  item.mechanicName
                 }
                 </span>
               </TableCell>              

@@ -1,50 +1,74 @@
-import React, { useState, useEffect } from 'react'
-import PageTitle from '../components/Typography/PageTitle'
-import {Input} from '@windmill/react-ui'
-import {SearchIcon } from '../icons'
-import mechanicData from '../utils/demo/mechanicData'
-import MechanicTable from '../components/Tables/MechanicTable'
+import React, { useState, useEffect } from 'react';
+import PageTitle from '../components/Typography/PageTitle';
+import { Input } from '@windmill/react-ui';
+import { SearchIcon } from '../icons';
+import MechanicTable from '../components/Tables/MechanicTable';
 import { useHistory } from 'react-router-dom';
-
+import { getMechanics } from '../apis/mechanicApi'; 
 
 function Tables() {
-    const [allData, setAllData] = useState(mechanicData); // Store original data
-    const [filteredData, setFilteredData] = useState(mechanicData); // Filtered data based on search
-    const [pageTable2, setPageTable2] = useState(1);
-    const [showNotVerified, setShowNotVerified] = useState(false);
-    const resultsPerPage = 10;
-    const totalResults = filteredData.length;
-    const history = useHistory();
+  const [allData, setAllData] = useState([]); 
+  const [filteredData, setFilteredData] = useState([]);
+  const [pageTable2, setPageTable2] = useState(1);
+  const [showNotVerified, setShowNotVerified] = useState(false);
+  const resultsPerPage = 10;
+  const totalResults = filteredData.length;
+  const history = useHistory();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); 
   
-    function onPageChangeTable2(p) {
-      setPageTable2(p);
-    }
+  const [searchQuery, setSearchQuery] = useState('');
 
-    const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
-  
-    const [searchQuery, setSearchQuery] = useState('');
-
-    useEffect(() => {
-      let filteredArray = allData.filter(mechanic => 
-        mechanic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mechanic.workshopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mechanic.cnic.includes(searchQuery)
-      );
-
-      if (showNotVerified) {
-        filteredArray = filteredArray.filter(mechanic => mechanic.verified === false);
+  useEffect(() => {
+    const fetchMechanics = async () => {
+      try {
+        const mechanics = await getMechanics(); 
+        setAllData(mechanics); 
+        setFilteredData(mechanics);
+        setLoading(false); 
+      } catch (err) {
+        setError('Failed to fetch mechanics');
+        setLoading(false); 
       }
-
-      setFilteredData(filteredArray);
-    }, [searchQuery, allData, showNotVerified]); 
-
-    const toggleNotVerified = () => {
-      setShowNotVerified(prev => !prev);
     };
-  
-    const goToProfile = (id) => {
-      history.push(`/app/mechanic/${id}`);
+    fetchMechanics(); 
+  }, []);
+
+  useEffect(() => {
+    let filteredArray = allData.filter(mechanic => 
+      mechanic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mechanic.workshopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mechanic.cnic.includes(searchQuery)
+    );
+
+    if (showNotVerified) {
+      filteredArray = filteredArray.filter(mechanic => mechanic.verified === false);
     }
+
+    setFilteredData(filteredArray);
+  }, [searchQuery, allData, showNotVerified]);
+
+  const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
+
+  const toggleNotVerified = () => {
+    setShowNotVerified(prev => !prev);
+  };
+
+  const goToProfile = (id) => {
+    history.push(`/app/mechanic/${id}`);
+  };
+
+  function onPageChangeTable2(p) {
+    setPageTable2(p);
+  }
+
+  if (loading) {
+    return <p>Loading mechanics...</p>; 
+  }
+
+  if (error) {
+    return <p>{error}</p>; 
+  }
 
   return (
     <>

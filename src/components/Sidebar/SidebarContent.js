@@ -4,13 +4,20 @@ import { NavLink, Route } from 'react-router-dom'
 import * as Icons from '../../icons'
 import SidebarSubmenu from './SidebarSubmenu'
 import { Button } from '@windmill/react-ui'
+import { useHistory } from 'react-router-dom';
 
 function Icon({ icon, ...props }) {
   const Icon = Icons[icon]
   return <Icon {...props} />
 }
 
-function SidebarContent() {
+function SidebarContent() {  
+  const history = useHistory(); 
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    history.push('/login');
+  };
+
   return (
     <div className="py-4 text-gray-500 dark:text-gray-400 h-full">
       <div className='flex flex-col justify-between h-full'>
@@ -47,7 +54,7 @@ function SidebarContent() {
           </ul>
         </div>
         <div className="px-6 my-6">
-          <Button size='small' layout="outline" className="flex border-red-600 text-red-600 dark:text-red-400 hover:bg-red-600 dark:hover:text-white hover:text-white justify-center items-center"><p className='text-sm font-semibold'>LOG OUT </p><Icons.LogoutIcon className='ml-1 h-6 w-6'/></Button>
+           <Button onClick={handleLogout} size='small' layout="outline" className="flex border-red-600 text-red-600 dark:text-red-400 hover:bg-red-600 dark:hover:text-white hover:text-white justify-center items-center"><p className='text-sm font-semibold'>LOG OUT </p><Icons.LogoutIcon className='ml-1 h-6 w-6'/></Button>
         </div>
       </div>
     </div>

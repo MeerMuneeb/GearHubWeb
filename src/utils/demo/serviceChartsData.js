@@ -1,5 +1,3 @@
-import serviceData from './serviceData'
-
 // Count services per month
 const countServicesPerMonth = (services, year) => {
   const counts = Array(12).fill(0); // For 12 months
@@ -84,7 +82,7 @@ const generateDayDatasets = (services, year, month) => {
 };
 
 // Line chart options by months
-export const serviceLineOptions = {
+export const serviceLineOptions = (serviceData) => ({
   data: {
     labels: [
       'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -126,10 +124,10 @@ export const serviceLineOptions = {
   legend: {
     display: true,
   },
-};
+});
 
 // Bar chart options by months
-export const servicebarOptions = {
+export const servicebarOptions = (serviceData) => ({
   data: {
     labels: [
       'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -143,10 +141,10 @@ export const servicebarOptions = {
   legend: {
     display: true,
   },
-}
+})
 
 // Line chart options by days
-export const serviceDayLineOptions = (year, month) => ({
+export const serviceDayLineOptions = (serviceData, year, month) => ({
   data: {
     labels: Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => i + 1), // Days of the month
     datasets: generateDayDatasets(serviceData, year, month),

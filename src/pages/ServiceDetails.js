@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PageTitle from '../components/Typography/PageTitle';
-import { Modal, ModalHeader, ModalBody, Card, CardBody, Button } from '@windmill/react-ui';
+import { Card, CardBody, Button } from '@windmill/react-ui';
 import dummyMap from '../assets/img/dummy-map.png';
-import serviceData from '../utils/demo/serviceData'
-import mechanicData from '../utils/demo/mechanicData'
-import userData from '../utils/demo/userData'
+import { getServiceById } from '../apis/servicesApi';
+import { getUserById } from '../apis/usersApi';
+import { getMechanicById } from '../apis/mechanicApi';
 import sparePartsData from '../utils/demo/sparepartsData'
 import { StarIcon } from '../icons';
 import { useHistory } from 'react-router-dom';
@@ -319,16 +319,16 @@ export default ServiceDetails;
 
 // Mock fetch functions (replace with actual API calls)
 const fetchServiceData = async (serviceID) => {
-  // Simulate API call to fetch service data based on serviceID
-  return serviceData.find(service => service.id === Number(serviceID));
+  const service = await getServiceById(serviceID);
+  return service
 };
 
 const fetchUserData = async (userID) => {
-  // Simulate API call to fetch user data based on userID
-  return userData.find(user => user.id === userID);
+  const user = await getUserById(userID);
+  return user
 };
 
 const fetchMechanicData = async (mechanicID) => {
-  // Simulate API call to fetch mechanic data based on mechanicID
-  return mechanicData.find(mechanic => mechanic.id === mechanicID);
+  const mechanic = await getMechanicById(mechanicID);
+  return mechanic
 };

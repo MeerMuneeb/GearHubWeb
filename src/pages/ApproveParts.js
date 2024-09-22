@@ -3,12 +3,16 @@ import PageTitle from '../components/Typography/PageTitle';
 import {Input, Alert } from '@windmill/react-ui';
 import { SearchIcon } from '../icons';
 import PartsTable from '../components/Tables/PartsTable';
-import partsData from '../utils/demo/sparepartsData';
+import {
+  getParts,
+  updatePart
+} from '../apis/partsApi';
+import { getMechanics } from '../apis/mechanicApi';
 
 function Tables() {
 
-  const [allData, setAllData] = useState(partsData);
-  const [filteredData, setFilteredData] = useState(partsData);
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const [pageTable2, setPageTable2] = useState(1);
   const resultsPerPage = 10;
@@ -22,18 +26,47 @@ function Tables() {
   // Paginate data
   const paginatedData = filteredData.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage);
 
+  const fetchParts = async () => {
+    try {
+      const parts = await getParts();      
+      const mechanics = await getMechanics();
+
+      const mergedData = parts.map(part => {
+        const mechanic = mechanics.find(m => m.id === part.mechanicID);
+        return {
+          ...part,
+          mechanicName: mechanic ? mechanic.name : 'Unknown Mechanic'
+        };
+      });
+
+      setAllData(mergedData);
+      setFilteredData(mergedData);
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+      window.alert("Error")
+    }
+  };
+
+  useEffect(() => {
+    fetchParts();
+  }, []);
+
   const handleDelete = (id) => {
     const updatedData = allData.filter(item => item.id !== id);
     setAllData(updatedData);
     setFilteredData(updatedData); // Update both states
   };
 
-  const addToLibrary = (id) => {
-    const updatedData = allData.filter(item => item.id !== id);
-    setAllData(updatedData);
-    setFilteredData(updatedData); 
+  const addToLibrary = async (id) => {
 
-    window.alert("Part Addedd to Library!!")
+    try {
+      await updatePart(id, {isApproved: true});
+      window.alert('item added to library successfully!')
+      fetchParts();
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+      window.alert('Error adding the Item!')
+    }
 
   }
 
@@ -44,7 +77,7 @@ function Tables() {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredData(filteredArray.filter(item => item.mechanicID !== null));
+    setFilteredData(filteredArray.filter(item => item.isApproved === false));
   }, [searchQuery, allData]);
 
   return (

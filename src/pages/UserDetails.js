@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import userData from '../utils/demo/userData';
 import PageTitle from '../components/Typography/PageTitle';
 import { Modal, ModalHeader, ModalBody, Card, CardBody, Badge, Button } from '@windmill/react-ui';
 import dummyCar from '../assets/img/dummy-car.png'; // Dummy car image
 import dummyMap from '../assets/img/dummy-map.png';
+import { getUserById } from '../apis/usersApi';
 
 function UserDetails() {
   const { userID } = useParams(); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePath, setImagePath] = useState(null);
+  const [user, setUser] = useState(null);
 
   const openModal = (path) => {
     if (path !== null) {
@@ -23,11 +24,21 @@ function UserDetails() {
     setIsModalOpen(false);
   }
 
-  // Find the user based on the ID
-  const user = userData.find((u) => u.id === userID);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedUser = await getUserById(userID);
+        setUser(fetchedUser);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        
+      }
+    };
+    fetchData();
+  }, []);
 
-  if (!user) {
-    return <p>User not found</p>;
+  if(!user){
+    return <p>User Loading...</p>
   }
 
   return (
