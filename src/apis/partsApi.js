@@ -7,8 +7,27 @@ export const getParts = async () => {
     return response.data;
 };
 
-export const createPart = async (partData) => {
-    const response = await axios.post(`${API_URL}/parts`, partData);
+// Updated createPart to handle file uploads
+export const createPart = async (partData, imageFile) => {
+    // Create a FormData object
+    const formData = new FormData();
+    
+    // Append part data to FormData
+    for (const key in partData) {
+        formData.append(key, partData[key]);
+    }
+
+    // Append the image file
+    if (imageFile) {
+        formData.append('image', imageFile); // 'image' should match your backend expectation
+    }
+
+    const response = await axios.post(`${API_URL}/parts`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data' // Set the appropriate content type
+        }
+    });
+
     return response.data;
 };
 
@@ -26,6 +45,3 @@ export const deletePart = async (id) => {
     const response = await axios.delete(`${API_URL}/parts/${id}`);
     return response.data;
 };
-
-
-

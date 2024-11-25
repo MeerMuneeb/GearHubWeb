@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { SidebarContext } from '../context/SidebarContext'
 import {
   MoonIcon,
@@ -10,6 +10,7 @@ import {
   OutlineLogoutIcon,
 } from '../icons'
 import { Avatar, Badge, Dropdown, DropdownItem, WindmillContext } from '@windmill/react-ui'
+import { getAdminById } from '../apis/adminApi';
 
 function Header() {
   const { mode, toggleMode } = useContext(WindmillContext)
@@ -17,6 +18,27 @@ function Header() {
 
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [adminID, setAdminID] = useState(null)
+  const [admin, setAdmin] = useState([])
+
+  useEffect(() => {
+    const id = localStorage.getItem('adminID');
+    if (id) {
+      setAdminID(id);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const data = await getAdminById(adminID); 
+        setAdmin(data);
+      } catch (error) {
+        console.error('Error fetching admins:', error);
+      }
+    };
+    fetchAdmins();
+  }, [adminID]);
 
   function handleNotificationsClick() {
     setIsNotificationsMenuOpen(!isNotificationsMenuOpen)
@@ -106,18 +128,14 @@ function Header() {
               isOpen={isProfileMenuOpen}
               onClose={() => setIsProfileMenuOpen(false)}
             >
-              <DropdownItem tag="a" href="#">
-                <OutlinePersonIcon className="w-4 h-4 mr-3" aria-hidden="true" />
-                <span>Profile</span>
+              <DropdownItem tag="a">
+                {/* <OutlinePersonIcon className="w-4 h-4 mr-3" aria-hidden="true" /> */}
+                <span>{admin.name}<br/>{admin.email}</span>
               </DropdownItem>
-              <DropdownItem tag="a" href="#">
-                <OutlineCogIcon className="w-4 h-4 mr-3" aria-hidden="true" />
-                <span>Settings</span>
-              </DropdownItem>
-              <DropdownItem onClick={() => alert('Log out!')}>
+              {/* <DropdownItem onClick={() => alert('Log out!')}>
                 <OutlineLogoutIcon className="w-4 h-4 mr-3" aria-hidden="true" />
                 <span>Log out</span>
-              </DropdownItem>
+              </DropdownItem> */}
             </Dropdown>
           </li>
         </ul>

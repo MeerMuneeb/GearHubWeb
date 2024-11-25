@@ -263,6 +263,7 @@ function Tables() {
       {/* Edit Admin Modal */}
       <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
         <ModalHeader>Edit Admin</ModalHeader>
+        <form onSubmit={handleEdit}>
         <ModalBody>
         <div className="px-4 py-3 mb-8">
             <Label>
@@ -271,12 +272,13 @@ function Tables() {
                 className="mt-1"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
             </Label>
 
             <Label className="mt-4">
               <span>Role</span>
-              <Select className="mt-1" value={role} onChange={(e) => setRole(e.target.value)}>
+              <Select className="mt-1" value={role} onChange={(e) => setRole(e.target.value)} required>
                 <option value="">Select Role</option>
                 <option value="SuperAdmin">Super Admin</option>
                 <option value="Admin">Admin</option>
@@ -298,9 +300,11 @@ function Tables() {
               <span>Email</span>
               <div className="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
                 <input
+                  type='email'
                   className="block w-full pl-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
                 <div className="absolute inset-y-0 flex items-center ml-3 pointer-events-none">
                   <MailIcon className="w-5 h-5" aria-hidden="true" />
@@ -312,9 +316,8 @@ function Tables() {
               <span>Password</span>
               <div className="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
                 <input
-                  type="password"
-                  className="block w-full pl-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
-                  value={password}
+                  placeholder='Type to change password!'
+                  className="block w-full pl-10 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"                  
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className="absolute inset-y-0 flex items-center ml-3 pointer-events-none">
@@ -328,8 +331,9 @@ function Tables() {
           <Button layout="outline" onClick={closeEditModal}>
             Cancel
           </Button>
-          <Button onClick={handleEdit}>Save</Button>
+          <Button type="submit">Save</Button>
         </ModalFooter>
+        </form>
       </Modal>
 
       <AdminTable

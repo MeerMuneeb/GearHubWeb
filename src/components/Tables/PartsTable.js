@@ -95,7 +95,7 @@ const TableComponent = ({
                 <div className="flex items-center">
                   <div className="w-32 h-32 border rounded-lg overflow-hidden">
                     <img
-                      src={item.img || "/img/default-avatar.jpg"}
+                      src={item.img || item.image || "/img/default-avatar.jpg"}
                       className="w-full h-full object-cover"
                       alt="Product"
                     />

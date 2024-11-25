@@ -14,7 +14,8 @@ function Tables() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [img, setImg] = useState('');
+  const [img, setimg] = useState(null); 
+  const [imageFile, setImageFile] = useState(null); 
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -52,9 +53,10 @@ function Tables() {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
+      setImageFile(file)
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImg(reader.result);
+        setimg(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -68,7 +70,7 @@ function Tables() {
     setName('');
     setDescription('');
     setPrice('');
-    setImg('');
+    setimg(''); setImageFile('');
     setAddModalOpen(false);
   }
 
@@ -79,7 +81,8 @@ function Tables() {
     setName(item.name);
     setDescription(item.description);
     setPrice(item.price);
-    setImg(item.img);
+    setImageFile(item.img);
+    setimg(item.img);
 
     setEditModalOpen(true);
   }
@@ -89,41 +92,41 @@ function Tables() {
     setName('');
     setDescription('');
     setPrice('');
-    setImg('');
+    setimg(''); setImageFile('');
     setEditModalOpen(false);
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     const newItem = {
       id: Math.random().toString(36).substring(2, 9),
       name,
       description,
       price: parseFloat(price),
-      img,
       mechanicID: null, 
       isApproved: true
     };
 
     try {
-      await createPart(newItem);
-      window.alert('item added successfully!')
+      await createPart(newItem, imageFile); // Send image file along with part data
+      window.alert('Item added successfully!');
       fetchParts();
     } catch (error) {
-      console.error('Error fetching parts:', error);
-      window.alert('Error Adding the Item!')
+      console.error('Error adding part:', error);
+      window.alert('Error adding the item!');
     }
 
     // Update both data states
     closeAddModal();
   };
 
-  const handleEdit = async () => {
+  const handleEdit = async (event) => {
+    event.preventDefault();
     const updatedItem = {
       id: editId, // Use the existing id
       name,
       description,
       price: parseFloat(price),
-      img,
       mechanicID: null, 
       isApproved: true
     };
@@ -158,7 +161,7 @@ function Tables() {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredData(filteredArray.filter(item => item.isApproved === true));
+    setFilteredData(filteredArray.filter(item => item.isApproved === true || item.isApproved === "true"));
   }, [searchQuery, allData]);
 
   return (
@@ -175,6 +178,7 @@ function Tables() {
             placeholder="Search by name or description..."
             aria-label="Search"
             value={searchQuery}
+            required
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
@@ -186,6 +190,7 @@ function Tables() {
 
         {/* Add Product Modal */}
       <Modal isOpen={isAddModalOpen} onClose={closeAddModal}>
+        <form onSubmit={handleSubmit}>
         <ModalHeader>Add Item</ModalHeader>
         <ModalBody>
           <div className="px-4 py-3 mb-8">
@@ -195,6 +200,7 @@ function Tables() {
                 className="mt-1"
                 placeholder="Product Name"
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
               />
             </Label>
@@ -205,6 +211,7 @@ function Tables() {
                 className="mt-1" rows='3'
                 placeholder="Product Description"
                 value={description}
+                required
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Label>
@@ -216,6 +223,7 @@ function Tables() {
                 className="mt-1"
                 placeholder="Price"
                 value={price}
+                required
                 onChange={(e) => setPrice(e.target.value)}
               />
             </Label>
@@ -228,7 +236,8 @@ function Tables() {
                   className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
                   placeholder="http://dummyimage.com/231x100.png"
                   value={img}
-                  onChange={(e) => setImg(e.target.value)}
+                  required
+                  onChange={(e) => setimg(e.target.value)}
                 />
                 <button
                   className="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
@@ -241,6 +250,7 @@ function Tables() {
                   accept="image/*"
                   ref={fileInputRef}
                   style={{ display: 'none' }}
+                  required
                   onChange={handleImageUpload}
                 />
               </div>
@@ -267,12 +277,14 @@ function Tables() {
           <Button layout="outline" onClick={closeAddModal}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Submit</Button>
+          <Button type="submit">Submit</Button>
         </ModalFooter>
+        </form>
       </Modal>
 
       {/* Edit Product Modal */}
       <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+        <form onSubmit={handleEdit}>
         <ModalHeader>Edit Item</ModalHeader>
         <ModalBody>
           <div className="px-4 py-3 mb-8">
@@ -281,6 +293,7 @@ function Tables() {
               <Input
                 className="mt-1"
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
               />
             </Label>
@@ -290,6 +303,7 @@ function Tables() {
               <Textarea
                 className="mt-1" rows='3'
                 value={description}
+                required
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Label>
@@ -300,6 +314,7 @@ function Tables() {
                 type="number"
                 className="mt-1"
                 value={price}
+                required
                 onChange={(e) => setPrice(e.target.value)}
               />
             </Label>
@@ -311,7 +326,8 @@ function Tables() {
                 <input
                   className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
                   value={img}
-                  onChange={(e) => setImg(e.target.value)}
+                  required
+                  onChange={(e) => setimg(e.target.value)}
                 />
                 <button
                   className="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
@@ -324,6 +340,7 @@ function Tables() {
                   accept="image/*"
                   ref={fileInputRef}
                   style={{ display: 'none' }}
+                  required
                   onChange={handleImageUpload}
                 />
               </div>
@@ -350,8 +367,9 @@ function Tables() {
           <Button layout="outline" onClick={closeEditModal}>
             Cancel
           </Button>
-          <Button onClick={handleEdit}>Save</Button>
+          <Button type="submit">Save</Button>
         </ModalFooter>
+        </form>
       </Modal>
 
       <PartsTable

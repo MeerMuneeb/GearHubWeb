@@ -23,19 +23,19 @@ function Login() {
       setError('');
       try {
           const data = await loginAdmin({ email, password });
-  
-          // Assuming your backend returns the JWT token as `token`
-          console.log("Login Response: ", data);  // Log the data received
+          console.log("Login Response: ", data); 
   
           if (data.token) {
-              localStorage.setItem('adminToken', data.token); // Store the JWT token
+              localStorage.setItem('adminToken', data.token);
+              localStorage.setItem('adminID', data.admin.id);
               console.log("Token saved:", data.token);
-              history.push('/app'); // Redirect to protected route after successful login
+              console.log("Id here:", data.admin.id);
+              history.push('/app'); 
           } else {
               throw new Error('Login failed, please check your credentials.');
           }
       } catch (err) {
-          console.log('Error: ', err);  // Log any errors
+          console.log('Error: ', err);
           setError('Invalid credentials, please try again.');
       }
   };
