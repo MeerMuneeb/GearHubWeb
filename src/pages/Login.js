@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { loginAdmin } from '../apis/adminApi'; 
 import { Label, Input, Button } from '@windmill/react-ui';
-import ImageLight from '../assets/img/login-office.jpeg';
-import ImageDark from '../assets/img/login-office-dark.jpeg';
+import ImageLight from '../assets/img/login-offic.jpg';
+import ImageDark from '../assets/img/login-offic.jpg';
 
 function Login() {
     const [email, setEmail] = useState('');

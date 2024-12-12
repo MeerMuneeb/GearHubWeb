@@ -196,7 +196,7 @@ function VerifyMechanic() {
               : 'Approve Mechanic'}
           </Button>
           <Button layout="link" className="text-red-600 dark:text-red-400" onClick={handleCancel}>
-            Cancel
+            Close
           </Button>
         </div>
       </div>
